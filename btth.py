@@ -4,6 +4,7 @@ logging.basicConfig(
     filename="arena_tickets.log",
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
+    encoding="utf-8",
 )
 
 
@@ -54,10 +55,11 @@ def display_tickets(tickets):
 def book_ticket(tickets):
     print("\n--- ĐẶT VÉ MỚI ---")
     ticket_id = input("Nhập mã vé: ").strip().upper()
-    if any(t["ticket_id"] == ticket_id for t in tickets):
-        print(f"Lỗi: Mã vé {ticket_id} đã tồn tại.")
-        logging.warning(f"Duplicate ticket ID entered: {ticket_id}")
-        return
+    for t in tickets:
+        if t["ticket_id"] == ticket_id:
+            print(f"Lỗi: Mã vé {ticket_id} đã tồn tại.")
+            logging.warning(f"Duplicate ticket ID entered: {ticket_id}")
+            return
 
     name = input("Nhập tên khách hàng: ").strip().title()
     while True:
@@ -99,9 +101,14 @@ def change_seat(tickets):
     print("\n--- ĐỔI CHỖ NGỒI ---")
     ticket_id = input("Nhập mã vé cần đổi chỗ: ").strip().upper()
 
-    ticket = next((t for t in tickets if t["ticket_id"] == ticket_id), None)
+    ticket = None
 
-    if not ticket:
+    for t in tickets:
+        if t["ticket_id"] == ticket_id:
+            ticket = t
+            break
+
+    if ticket is None:
         print(f"\nKhông tìm thấy vé mang mã {ticket_id}.")
         logging.warning(f"Change seat failed - Ticket {ticket_id} not found")
         return
@@ -126,9 +133,14 @@ def cancel_ticket(tickets):
     print("\n--- HỦY VÉ ---")
     ticket_id = input("Nhập mã vé cần hủy: ").strip().upper()
 
-    ticket = next((t for t in tickets if t["ticket_id"] == ticket_id), None)
+    ticket = None
 
-    if not ticket:
+    for t in tickets:
+        if t["ticket_id"] == ticket_id:
+            ticket = t
+            break
+
+    if ticket is None:
         print(f"\nKhông tìm thấy vé mang mã {ticket_id}.")
         logging.warning(f"Cancel ticket failed - Ticket {ticket_id} not found")
         return
@@ -186,7 +198,8 @@ ticket_db = [
     },
 ]
 
-if __name__ == "__main__":
+
+def main():
     while True:
         print("""
 === HỆ THỐNG QUẢN LÝ VÉ RIKKEI ESPORTS ===
@@ -222,3 +235,7 @@ if __name__ == "__main__":
                 break
             case _:
                 print("Lựa chọn không hợp lệ. Vui lòng nhập từ 1 đến 6.")
+
+
+if __name__ == "__main__":
+    main()
